@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>دردشة GPT - Modweeb</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+
+    .chat-container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+
+    .chat-box {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fefefe;
+      margin-bottom: 15px;
+    }
+
+    .chat-box div {
+      margin-bottom: 10px;
+    }
+
+    .user {
+      text-align: right;
+      color: #1a73e8;
+    }
+
+    .bot {
+      text-align: left;
+      color: #333;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0f5ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h2 style="text-align: center;">💬 دردشة GPT الذكية</h2>
+    <div id="chat-box" class="chat-box"></div>
+    <textarea id="user-input" rows="3" placeholder="اكتب رسالتك هنا..."></textarea>
+    <button onclick="sendMessage()">إرسال</button>
+  </div>
+
+  <script>
+  const chatBox = document.getElementById("chat-box");
+  const userInput = document.getElementById("user-input");
+
+  async function sendMessage() {
+    const message = userInput.value.trim();
+    if (!message) return;
+
+    appendMessage("أنت", message, "user");
+    userInput.value = "";
+
+    appendMessage("GPT", "جاري الكتابة...", "bot");
+
+    try {
+      const response = await fetch("https://modweeb-ai.modweeb3.workers.dev", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+
+      if (!response.ok) throw new Error("فشل في الاتصال بالخادم");
+      const { reply } = await response.json();
+      updateLastBotMessage(reply);
+    } catch (error) {
+      updateLastBotMessage("⚠️ حدث خطأ: " + error.message);
+      console.error("Error:", error);
+    }
+  }
+
+  function appendMessage(sender, text, type) {
+    const div = document.createElement("div");
+    div.className = type;
+    div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function updateLastBotMessage(text) {
+    const messages = chatBox.getElementsByClassName("bot");
+    if (messages.length > 0) {
+      messages[messages.length - 1].innerHTML = `<strong>GPT:</strong> ${text}`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  }
+
+  // إرسال الرسالة بالضغط على Enter
+  userInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+</script>
+</body>
+</html>
