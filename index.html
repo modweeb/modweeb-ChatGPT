@@ -92,11 +92,11 @@
     appendMessage("GPT", "جاري الكتابة...", "bot");
 
     try {
-      const response = await fetch("https://modweeb-ai.modweeb3.workers.dev", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
-      });
+      const response = await fetch("https://modweeb-chatgpt.modweeb3.workers.dev", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message })
+});
 
       if (!response.ok) throw new Error("فشل في الاتصال بالخادم");
       const { reply } = await response.json();
